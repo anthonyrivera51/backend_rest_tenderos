@@ -1,0 +1,6 @@
+schema: http://localhost:4000/graphql
+documents: ./src/**/*.graphql
+plugins:
+  - typescript-operations
+  - typescript-react-apollo
+cacheDir: __generated__
