@@ -178,6 +178,15 @@ const ActionButtons = ({
           <EditIcon width={16} />
         </button>
       )}
+      {/* {editModalView && (
+        <button
+          onClick={handleEditModalPermission}
+          className="transition duration-200 text-body hover:text-heading focus:outline-none"
+          title={t('common:text-edit')}
+        >
+          <EditIcon width={16} />
+        </button>
+      )} */}
       {approveButton &&
         (!isShopActive ? (
           <button

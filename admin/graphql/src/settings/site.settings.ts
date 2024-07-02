@@ -357,9 +357,21 @@ export const siteSettings = {
         icon: 'SettingsIcon',
         childMenu: [
           {
-            href: Routes.user.list,
+            href: "",
             label: 'text-all-users',
             icon: 'UsersIcon',
+            childMenu: [
+              {
+                href: Routes.user.list,
+                label: 'text-list-users',
+                icon: 'UsersIcon',
+              },
+              {
+                href: Routes.user.create,
+                label: 'text-create-users',
+                icon: 'UsersIcon',
+              },
+            ],
           },
           // {
           //   href: Routes.adminList,
@@ -407,6 +419,8 @@ export const siteSettings = {
           // },
         ],
       },
+
+
 
       // feedback: {
       //   href: '',

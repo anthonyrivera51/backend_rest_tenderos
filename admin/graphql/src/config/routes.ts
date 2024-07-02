@@ -18,6 +18,9 @@ export const Routes = {
   user: {
     ...routesFactory('/users'),
   },
+  modulo: {
+    ...routesFactory('/modulos'),
+  },
   type: {
     ...routesFactory('/groups'),
   },
