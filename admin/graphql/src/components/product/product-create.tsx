@@ -7,7 +7,8 @@ interface Product {
   name: string;
   code: number;
   stock: number;
-  price: number;
+  precioBruto: number;
+  precioNeto: number;
   description: string;
   category: string;
   imageUrl: string;
@@ -89,10 +90,6 @@ const CreateProduct: React.FC = () => {
             <thead className="bg-gray-50">
               <tr>
                 <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Name</th>
-                <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Stock</th>
-                <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Price</th>
-                <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Code</th>
-                <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Description</th>
                 <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Category</th>
                 <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Image</th>
                 <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Actions</th>
@@ -102,10 +99,6 @@ const CreateProduct: React.FC = () => {
               {product.map((product, index) => (
                 <tr key={index} className="hover:bg-gray-100 transition duration-200">
                   <td className="py-3 px-4 border-b">{product.name}</td>
-                  <td className="py-3 px-4 border-b">{product.stock}</td>
-                  <td className="py-3 px-4 border-b">{product.price}</td>
-                  <td className="py-3 px-4 border-b">{product.code}</td>
-                  <td className="py-3 px-4 border-b">{product.description}</td>
                   <td className="py-3 px-4 border-b">{product.category}</td>
                   <td className="py-3 px-4 border-b">
                     {product.imageUrl && (

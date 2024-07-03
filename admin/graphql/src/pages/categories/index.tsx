@@ -20,6 +20,7 @@ import { useRouter } from 'next/router';
 import { Routes } from '@/config/routes';
 import { Config } from '@/config';
 import PageHeading from '@/components/common/page-heading';
+import CategoriasList from '@/components/category/categoria-list';
 
 export default function Categories() {
   const { t } = useTranslation();
@@ -65,7 +66,7 @@ export default function Categories() {
       <Card className="mb-8 flex flex-col">
         <div className="flex w-full flex-col items-center md:flex-row">
           <div className="mb-4 md:mb-0 md:w-1/4">
-            <PageHeading title={t('form:input-label-categories')} />
+            <PageHeading title={t('Categoria')} />
           </div>
 
           <div className="flex w-full flex-col items-center space-y-4 ms-auto md:flex-row md:space-y-0 xl:w-3/4">
@@ -92,11 +93,12 @@ export default function Categories() {
         </div>
       </Card>
 
-      <CategoryList
+      {/* <CategoryList
         categories={data?.categories as CategoryPaginator}
         onPagination={handlePagination}
         refetch={refetch}
-      />
+      /> */}
+      <CategoriasList />
     </>
   );
 }

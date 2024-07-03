@@ -1,5 +1,5 @@
-import React, { useState, ChangeEvent, FormEvent, useEffect } from "react";
-import Modal from "react-modal";
+import React, { useState, ChangeEvent, FormEvent, useEffect } from 'react';
+import Modal from 'react-modal';
 
 const categories = ['Vegetales', 'Frutas', 'Carnes', 'Bebidas', 'Aseo'];
 
@@ -8,11 +8,11 @@ interface Product {
   name: string;
   code: number;
   stock: number;
-  price: number;
+  precioBruto: number;
+  precioNeto: number;
   description: string;
   category: string;
   imageUrl: string;
-
 }
 
 interface InventoryModalProps {
@@ -22,16 +22,22 @@ interface InventoryModalProps {
   productToEdit?: Product | null; // Para editar productos
 }
 
-const InventoryModal: React.FC<InventoryModalProps> = ({ isOpen, onRequestClose, addProducts, productToEdit }) => {
+const InventoryModal: React.FC<InventoryModalProps> = ({
+  isOpen,
+  onRequestClose,
+  addProducts,
+  productToEdit,
+}) => {
   const [product, setProduct] = useState<Product>({
     id: 0,
-    name: "",
+    name: '',
     code: 0,
     stock: 0,
-    price: 0,
-    description: "",
+    precioBruto: 0,
+    precioNeto:0,
+    description: '',
     category: categories[0],
-    imageUrl: "",
+    imageUrl: '',
   });
 
   useEffect(() => {
@@ -40,7 +46,9 @@ const InventoryModal: React.FC<InventoryModalProps> = ({ isOpen, onRequestClose,
     }
   }, [productToEdit]);
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target;
     setProduct({
       ...product,
@@ -67,13 +75,14 @@ const InventoryModal: React.FC<InventoryModalProps> = ({ isOpen, onRequestClose,
     addProducts(product);
     setProduct({
       id: 0,
-      name: "",
+      name: '',
       code: 0,
       stock: 0,
-      price: 0,
-      description: "",
+      precioBruto: 0,
+      precioNeto: 0,
+      description: '',
       category: categories[0],
-      imageUrl: "",
+      imageUrl: '',
     });
     onRequestClose();
   };
@@ -82,11 +91,16 @@ const InventoryModal: React.FC<InventoryModalProps> = ({ isOpen, onRequestClose,
     <Modal
       isOpen={isOpen}
       onRequestClose={onRequestClose}
-      className="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-6 relative z-50"
+      className="max-w-6xl mx-auto bg-white shadow-md rounded-lg p-6 relative z-50 overflow-y-auto"
       overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40"
     >
-      <h2 className="text-2xl font-bold mb-4">Agregar Producto</h2>
-      <form onSubmit={handleSubmit}>
+      <h2 className="text-2xl font-bold mb-4">
+        {productToEdit ? 'Actualizar Producto' : 'Agregar Producto'}
+      </h2>
+      <div className="fixed inset-0 flex items-center justify-center z-50">
+  <div className="bg-white w-full max-w-4xl p-6 mx-2 rounded-lg shadow-lg">
+    <form onSubmit={handleSubmit}>
+      <div className="grid grid-cols-2 gap-4">
         <div className="mb-4">
           <label className="block text-gray-700">Nombre del Producto</label>
           <input
@@ -110,7 +124,7 @@ const InventoryModal: React.FC<InventoryModalProps> = ({ isOpen, onRequestClose,
           />
         </div>
         <div className="mb-4">
-          <label className="block text-gray-700">Codigo de barras</label>
+          <label className="block text-gray-700">Código de barras</label>
           <input
             type="number"
             name="code"
@@ -121,17 +135,17 @@ const InventoryModal: React.FC<InventoryModalProps> = ({ isOpen, onRequestClose,
           />
         </div>
         <div className="mb-4">
-          <label className="block text-gray-700">Precio</label>
+          <label className="block text-gray-700">Precio bruto</label>
           <input
             type="number"
-            name="price"
-            value={product.price}
+            name="precioBruto"
+            value={product.precioBruto}
             onChange={handleChange}
             className="mt-1 p-2 w-full border rounded-md"
             required
           />
         </div>
-        <div className="mb-4">
+        <div className="col-span-2 mb-4">
           <label className="block text-gray-700">Descripción</label>
           <textarea
             name="description"
@@ -141,7 +155,7 @@ const InventoryModal: React.FC<InventoryModalProps> = ({ isOpen, onRequestClose,
             required
           ></textarea>
         </div>
-        <div className="mb-4">
+        <div className="col-span-2 mb-4">
           <label className="block text-gray-700">Categoría</label>
           <select
             name="category"
@@ -156,7 +170,7 @@ const InventoryModal: React.FC<InventoryModalProps> = ({ isOpen, onRequestClose,
             ))}
           </select>
         </div>
-        <div className="mb-4">
+        <div className="col-span-2 mb-4">
           <label className="block text-gray-700">Imagen del Producto</label>
           <input
             type="file"
@@ -166,22 +180,26 @@ const InventoryModal: React.FC<InventoryModalProps> = ({ isOpen, onRequestClose,
             accept="image/*"
           />
         </div>
-        <div className="flex justify-end">
-          <button
-            type="button"
-            onClick={onRequestClose}
-            className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-700 mr-2"
-          >
-            Cancelar
-          </button>
-          <button
-            type="submit"
-            className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
-          >
-            {productToEdit ? "Actualizar Producto" : "Agregar Producto"}
-          </button>
-        </div>
-      </form>
+      </div>
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={onRequestClose}
+          className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-700 mr-2"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
+        >
+          {productToEdit ? 'Actualizar Producto' : 'Agregar Producto'}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
     </Modal>
   );
 };

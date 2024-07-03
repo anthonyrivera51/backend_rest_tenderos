@@ -1,243 +1,126 @@
-import { NoDataFound } from '@/components/icons/no-data-found';
-import Badge from '@/components/ui/badge/badge';
-import LanguageSwitcher from '@/components/ui/lang-action/action';
-import Pagination from '@/components/ui/pagination';
-import { Table } from '@/components/ui/table';
-import TitleWithSort from '@/components/ui/title-with-sort';
-import { Routes } from '@/config/routes';
-import { siteSettings } from '@/settings/site.settings';
-import { QueryProductsOrderByColumn } from '@/types/custom-types';
-import { useIsRTL } from '@/utils/locals';
-import { Product, ProductPaginator, SortOrder } from '__generated__/__types__';
-import debounce from 'lodash/debounce';
-import { useTranslation } from 'next-i18next';
-import Image from 'next/image';
-import { useRouter } from 'next/router';
-import { useMemo, useState } from 'react';
+import React, { useEffect, useState } from "react";
+import InventoryModal from "../modals/modals-product/modal-create-product";
+import 'tailwindcss/tailwind.css';
 
-export type IProps = {
-  products: ProductPaginator | null | undefined;
-  onPagination: (current: number) => void;
-  refetch: Function;
-};
+interface Product {
+  id: number;
+  name: string;
+  code: number;
+  stock: number;
+  precioBruto: number;
+  precioNeto: number;
+  description: string;
+  category: string;
+  imageUrl: string;
+}
 
-const ProductInventoryList = ({ products, onPagination, refetch }: IProps) => {
-  const router = useRouter();
-  const { t } = useTranslation();
-  const {
-    query: { shop },
-  } = router;
-  const { alignLeft } = useIsRTL();
+const ProductListInventario: React.FC = () => {
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [product, setProduct] = useState<Product[]>([]);
+  const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
 
-  const [order, setOrder] = useState<SortOrder>(SortOrder.Desc);
-  const [column, setColumn] = useState<string>();
+  useEffect(() => {
+    const storedProducts: Product[] = JSON.parse(localStorage.getItem('products') || '[]');
+    setProduct(storedProducts);
+    console.log('Productos cargados desde localStorage:', storedProducts);
+  }, []);
 
-  const debouncedHeaderClick = useMemo(
-    () =>
-      debounce((value) => {
-        setColumn(value);
-        setOrder(order === SortOrder.Desc ? SortOrder.Asc : SortOrder.Desc);
-        refetch({
-          orderBy: value,
-          sortedBy: order === SortOrder.Desc ? SortOrder.Asc : SortOrder.Desc,
-        });
-      }, 500),
-    [order]
-  );
+  const addProducts = (newProduct: Product) => {
+    if (isEditing && currentProduct) {
+      const updatedProducts = product.map((prod) =>
+        prod.id === currentProduct.id ? newProduct : prod
+      );
+      setProduct(updatedProducts);
+      localStorage.setItem("products", JSON.stringify(updatedProducts));
+      setIsEditing(false);
+      setCurrentProduct(null);
+    } else {
+      const newId = product.length > 0 ? product[product.length - 1].id + 1 : 1;
+      const productWithId = { ...newProduct, id: newId };
 
-  const onHeaderClick = (value: string | undefined) => ({
-    onClick: () => {
-      debouncedHeaderClick(value);
-    },
-  });
+      const updatedProducts = [...product, productWithId];
+      setProduct(updatedProducts);
+      localStorage.setItem("products", JSON.stringify(updatedProducts));
+    }
+  };
 
-  let columns = [
-    {
-      title: t('table:table-item-id'),
-      dataIndex: 'id',
-      key: 'id',
-      align: alignLeft,
-      width: 130,
-      render: (id: number) => `#${t('table:table-item-id')}: ${id}`,
-    },
-    {
-      title: (
-        <TitleWithSort
-          title={t('table:table-item-title')}
-          ascending={
-            order === SortOrder.Asc &&
-            column === QueryProductsOrderByColumn.NAME
-          }
-          isActive={column === QueryProductsOrderByColumn.NAME}
-        />
-      ),
-      className: 'cursor-pointer',
-      dataIndex: 'name',
-      key: 'name',
-      align: alignLeft,
-      width: 280,
-      ellipsis: true,
-      onHeaderCell: () => onHeaderClick(QueryProductsOrderByColumn.NAME),
-      render: (name: string, { image, type }: { image: any; type: any }) => (
-        <div className="flex items-center">
-          <div className="relative aspect-square h-10 w-10 shrink-0 overflow-hidden rounded border border-border-200/80 bg-gray-100 me-2.5">
-            <Image
-              src={image?.thumbnail ?? siteSettings.product.placeholder}
-              alt={name}
-              fill
-              priority={true}
-              sizes="(max-width: 768px) 100vw"
-            />
-          </div>
-          <div className="flex flex-col">
-            <span className="truncate font-medium">{name}</span>
-            <span className="truncate whitespace-nowrap pt-1 pb-0.5 text-[13px] text-body/80">
-              {type?.name}
-            </span>
-          </div>
-        </div>
-      ),
-    },
-    {
-      title: t('table:table-item-sku'),
-      dataIndex: 'sku',
-      key: 'sku',
-      width: 200,
-      align: alignLeft,
-      ellipsis: true,
-      render: (sku: any) => (
-        <span className="truncate whitespace-nowrap">{sku}</span>
-      ),
-    },
-    {
-      title: (
-        <TitleWithSort
-          title={t('table:table-item-quantity')}
-          ascending={
-            order === SortOrder.Asc &&
-            column === QueryProductsOrderByColumn.QUANTITY
-          }
-          isActive={column === QueryProductsOrderByColumn.QUANTITY}
-        />
-      ),
-      className: 'cursor-pointer',
-      dataIndex: 'quantity',
-      key: 'quantity',
-      align: 'center',
-      width: 150,
-      onHeaderCell: () => onHeaderClick(QueryProductsOrderByColumn.QUANTITY),
-      render: (quantity: number) => {
-        if (quantity < 10) {
-          return (
-            <>
-              <div
-                className={`flex justify-start ${
-                  quantity > 0 && quantity < 10
-                    ? 'flex-col items-baseline space-y-3 3xl:flex-row 3xl:space-x-2 3xl:space-y-0 rtl:3xl:space-x-reverse'
-                    : 'items-center space-x-2 rtl:space-x-reverse'
-                }`}
-              >
-                {quantity < 1 ? (
-                  <Badge
-                    text={t('common:text-out-of-stock')}
-                    color="bg-status-failed/10 text-status-failed"
-                    className="capitalize"
-                  />
-                ) : (
-                  <Badge
-                    text={t('common:text-low-quantity')}
-                    color="bg-status-failed/10 text-status-failed"
-                    animate={true}
-                    className="capitalize"
-                  />
-                )}
-                <span>{quantity}</span>
-              </div>
-            </>
-          );
-        }
-        return <span>{quantity}</span>;
-      },
-    },
-    {
-      title: (
-        <TitleWithSort
-          title={t('table:table-item-sold-quantity')}
-          ascending={
-            order === SortOrder.Asc &&
-            column === QueryProductsOrderByColumn.SOLD_QUANTITY
-          }
-          isActive={column === QueryProductsOrderByColumn.SOLD_QUANTITY}
-        />
-      ),
-      className: 'cursor-pointer',
-      dataIndex: 'sold_quantity',
-      key: 'sold_quantity',
-      width: 120,
-      align: 'center',
-      onHeaderCell: () =>
-        onHeaderClick(QueryProductsOrderByColumn.SOLD_QUANTITY),
-      render: (sold_quantity: number) => (
-        <span className="truncate whitespace-nowrap">{sold_quantity}</span>
-      ),
-    },
-    {
-      title: t('table:table-item-actions'),
-      dataIndex: 'slug',
-      key: 'actions',
-      align: 'right',
-      width: 120,
-      render: (slug: string, record: Product) => (
-        <LanguageSwitcher
-          slug={slug}
-          record={record}
-          deleteModalView="DELETE_PRODUCT"
-          routes={Routes?.inventory}
-          isShop={Boolean(shop)}
-          shopSlug={(shop as string) ?? ''}
-        />
-      ),
-    },
-  ];
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
 
-  if (router?.query?.shop) {
-    columns = columns?.filter((column) => column?.key !== 'shop');
-  }
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setIsEditing(false);
+    setCurrentProduct(null);
+  };
+
+  const handleEdit = (productToEdit: Product) => {
+    setCurrentProduct(productToEdit);
+    setIsEditing(true);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = (productToDelete: Product) => {
+    const updatedProducts = product.filter((prod) => prod !== productToDelete);
+    setProduct(updatedProducts);
+    localStorage.setItem("products", JSON.stringify(updatedProducts));
+  };
 
   return (
-    <>
-      <div className="mb-6 overflow-hidden rounded shadow">
-        <Table
-          /* @ts-ignore */
-          columns={columns}
-          emptyText={() => (
-            <div className="flex flex-col items-center py-7">
-              <NoDataFound className="w-52" />
-              <div className="mb-1 pt-6 text-base font-semibold text-heading">
-                {t('table:empty-table-data')}
-              </div>
-              <p className="text-[13px]">{t('table:empty-table-sorry-text')}</p>
-            </div>
-          )}
-          data={products?.data}
-          rowKey="id"
-          scroll={{ x: 900 }}
-        />
-      </div>
-
-      {!!products?.paginatorInfo?.total && (
-        <div className="flex items-center justify-end">
-          <Pagination
-            total={products?.paginatorInfo?.total}
-            current={products?.paginatorInfo?.currentPage}
-            pageSize={products?.paginatorInfo?.perPage}
-            onChange={onPagination}
-            showLessItems
-          />
+    <div className="p-6 bg-gray-100 min-h-screen">
+      <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg">
+        <div className="mt-6">
+          <h2 className="text-2xl font-bold text-gray-700 mb-4">Products</h2>
+          <table className="min-w-full bg-white border border-gray-200 rounded-lg overflow-hidden shadow-md">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Name</th>
+                <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Category</th>
+                <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">codigo</th>
+                <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Stock</th>
+                <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Precio bruto</th>
+                <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Precio neto</th>
+                <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Descripcion</th>
+                <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Image</th>
+                <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {product.map((product, index) => (
+                <tr key={index} className="hover:bg-gray-100 transition duration-200">
+                  <td className="py-3 px-4 border-b">{product.name}</td>
+                  <td className="py-3 px-4 border-b">{product.category}</td>
+                  <td className="py-3 px-4 border-b">{product.code}</td>
+                  <td className="py-3 px-4 border-b">{product.stock}</td>
+                  <td className="py-3 px-4 border-b">{product.precioBruto}</td>
+                  <td className="py-3 px-4 border-b">{product.precioNeto}</td>
+                  <td className="py-3 px-4 border-b">{product.description}</td>
+                  <td className="py-3 px-4 border-b">
+                    {product.imageUrl && (
+                      <img
+                        src={product.imageUrl}
+                        alt={product.name}
+                        className="h-16 w-16 object-cover"
+                      />
+                    )}
+                  </td>
+                  <td className="py-3 px-4 border-b flex space-x-2">
+                    <button onClick={() => handleEdit(product)} className="text-blue-500 hover:text-blue-700">
+                      edit
+                    </button>
+                    <button onClick={() => handleDelete(product)} className="text-red-500 hover:text-red-700">
+                      delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-      )}
-    </>
+      </div>
+    </div>
   );
 };
 
-export default ProductInventoryList;
+export default ProductListInventario;

@@ -43,7 +43,7 @@ export default function TaxesPage() {
     <>
       <Card className="mb-8 flex flex-col items-center md:flex-row">
         <div className="mb-4 md:mb-0 md:w-1/4">
-          <PageHeading title={t('form:input-label-taxes')} />
+          <PageHeading title={t('Impuestos')} />
         </div>
 
         <div className="flex w-full flex-col items-center space-y-4 ms-auto md:flex-row md:space-y-0 xl:w-1/2">
@@ -56,12 +56,13 @@ export default function TaxesPage() {
             href={`${Routes.tax.create}`}
             className="h-12 w-full md:w-auto md:ms-6"
           >
-            <span>+ {t('form:button-label-add-tax')}</span>
+            <span> + {t('Agregar impuesto')}</span>
           </LinkButton>
         </div>
       </Card>
 
-      <TaxList taxes={data?.taxClasses as Tax[]} refetch={refetch} />
+      <TaxList/>
+
     </>
   );
 }

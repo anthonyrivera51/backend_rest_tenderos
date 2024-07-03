@@ -23,6 +23,7 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import ProductListInventario from '@/components/product/product-inventory-list';
 
 interface ProductTypeOptions {
   name: string;
@@ -111,36 +112,10 @@ export default function ProductsPage() {
             'visible h-auto': visible,
             'invisible h-0': !visible,
           })}
-        >
-          <div className="mt-5 flex w-full flex-col border-t border-gray-200 pt-5 md:mt-8 md:flex-row md:items-center md:pt-8">
-            <CategoryTypeFilter
-              className="w-full"
-              type={type}
-              onCategoryFilter={(category: Category) => {
-                setCategory(category?.slug!);
-                setPage(1);
-              }}
-              onTypeFilter={(type: Type) => {
-                setType(type?.slug!);
-                setPage(1);
-              }}
-              onProductTypeFilter={(productType: ProductTypeOptions) => {
-                setProductType(productType?.slug!);
-                setPage(1);
-              }}
-              enableCategory
-              enableType
-              enableProductType
-            />
-          </div>
-        </div>
+        ></div>
       </Card>
 
-      <ProductInventoryList
-        products={data?.products as ProductPaginator}
-        onPagination={handlePagination}
-        refetch={refetch}
-      />
+      <ProductListInventario />
     </>
   );
 }

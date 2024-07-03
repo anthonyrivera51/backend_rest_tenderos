@@ -4,6 +4,7 @@ import PaymentModal from '../modals/modals-product/modal-pay-product';
 import ModalOpenCashRegister from '../modals/modals-order/modal-open-cashRegister';
 import ProductCard from '../order/product-card';
 import SelectedProductTable from '../order/selected-product-table';
+import { Switch } from '@headlessui/react';
 
 interface Product {
   name: string;
@@ -26,6 +27,7 @@ const SalesProducts = () => {
   const [summary, setSummary] = useState<Product[]>([]);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState<boolean>(false);
   const [ModalOCRIsOpen, setModalORCIsOpen] = useState<boolean>(false);
+  const [domiciliosActivos, setDomiciliosActivos] = useState<boolean>(false)
 
   useEffect(() => {
     setModalORCIsOpen(true);
@@ -115,10 +117,19 @@ const SalesProducts = () => {
       <ModalOpenCashRegister
         isOpen={ModalOCRIsOpen}
         onRequestClosed={closeModal}
+        setDomiciliosActivos={setDomiciliosActivos}
       />
       <div className="p-6 bg-white shadow-lg rounded-lg mt-6">
         <div className="container mx-auto py-8">
           <h1 className="text-3xl font-bold mb-4">Ventas de Productos</h1>
+          <div className="flex items-center mb-4">
+            <Switch
+              checked={domiciliosActivos}
+              onChange={setDomiciliosActivos}
+              className="mr-2"
+            />
+            <span>{domiciliosActivos ? 'Domicilios Activados' : 'Domicilios Desactivados'}</span>
+          </div>
           <button
             onClick={handleCheckout}
             className="fixed top-1/2 right-4 transform -translate-y-1/2 bg-green-700 text-white px-4 py-2 rounded shadow-lg"
