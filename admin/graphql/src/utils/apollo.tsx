@@ -58,7 +58,6 @@ function createApolloClient() {
   });
   const httpLink = createUploadLink({
     uri: process.env.NEXT_PUBLIC_GRAPHQL_API_ENDPOINT, // Server URL (must be absolute)
-    credentials: 'same-origin',
   });
 
   return new ApolloClient({

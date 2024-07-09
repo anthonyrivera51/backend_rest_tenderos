@@ -10,6 +10,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.use(graphqlUploadExpress({ maxFileSize: 1000000, maxFiles: 10 }));
   const PORT = process.env.PORT || 4000;
+  
   await app.listen(PORT);
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
