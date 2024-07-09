@@ -6,10 +6,10 @@ services:
     container_name: nestjs_rest
     environment:
       - APP_NAME=Marvel
-      - PORT=4000
+      - PORT=9000
       - DEFAULT_CURRENCY=USD
     ports:
-      - '5000:5000'
+      - '9000:9000'
     networks:
       - nestjs_rest
 

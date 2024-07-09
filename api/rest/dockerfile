@@ -32,6 +32,6 @@ RUN npm install --f
 
 RUN rm package*.json
 
-EXPOSE 5000
+EXPOSE 9000
 
 CMD ["node", "dist/main.js"]
