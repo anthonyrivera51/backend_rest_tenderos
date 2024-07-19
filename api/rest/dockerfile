@@ -21,7 +21,7 @@ WORKDIR /usr/src/app
 
 ARG prod=production
 ENV NODE_ENV=${development}
-ENV PORT=5000
+ENV PORT=9000
 ENV DEFAULT_CURRENCY=USD
 
 COPY --from=build /usr/src/app/dist ./dist
