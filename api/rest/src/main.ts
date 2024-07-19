@@ -14,6 +14,16 @@ async function bootstrap() {
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true, // Enable CORS credentials (cookies, authorization headers, etc.)
   };
+
+  // Enable CORS middleware
+  app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', 'http://localhost:*'); // Replace with your Next.js frontend domain
+    res.header('Access-Control-Allow-Origin', 'https://tenderos-frontend-umohnyjl4q-ue.a.run.app'); // Replace with your Next.js frontend domain
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    next();
+  });
   
   app.enableCors(corsOptions);
   app.setGlobalPrefix('api');
